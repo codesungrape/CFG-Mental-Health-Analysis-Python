@@ -1,5 +1,6 @@
 import csv
 from pprint import pprint
+from collections import Counter
 
 #define file path
 file_path = 'data/student_mental_health.csv'
@@ -75,6 +76,34 @@ def male_or_female():
 # print(male)
 # print(female)
 
+def what_year():
+    male_year = []
+    total_male_data = []
+    female_year = []
+    total_female_data = []
+
+    for participant in spreadsheet_data:
+        gender_str = participant.get("Choose your gender", "").strip().title()
+        gender_year = participant.get("Your current year of Study").strip().title()
+        if gender_str == "Male":
+            male_year.append(gender_year)
+            total_male_data.append(participant)
+        elif gender_str == "Female":
+            female_year.append(gender_year)
+            total_female_data.append(participant)
+    # Count how many males and females are in what year
+    count_male_year = Counter(male_year)
+    count_female_year = Counter(female_year)
+
+    print(f"There are {len(spreadsheet_data)} participants of whom {len(total_male_data)} are Male and they are in the following years {count_male_year}")
+    print(f"There are {len(spreadsheet_data)} participants of whom {len(total_female_data)} are Female and they are in the following years {count_female_year}")
+    return [male_year, total_male_data, female_year, total_female_data]
+
+#call what_year() function to see print statements
+what_year()
+
+
+
 
 # From this sections onwards, I have more specific data, or split original data into subsets
 
@@ -93,7 +122,8 @@ def is_depressed():
         elif answer_str1 == 'No':
             ans_no += 1
 
-    print(f"Total of participants who answered 'Yes' to feeling depressed is {ans_yes} and 'No' to feeling depressed is {ans_no}")
+    percentage_depressed = round((ans_yes/len(spreadsheet_data)) * 100, 2)
+    print(f"Total of participants who answered 'Yes' to feeling depressed is {ans_yes} and 'No' to feeling depressed is {ans_no}. This is a {percentage_depressed}% of participants who indentify as being depressed.")
     return [ans_yes, ans_no, depressed_participants]
 
 result = is_depressed()
@@ -121,6 +151,39 @@ def gender_difference_depressed(result):
 
 depressed_gender_data = gender_difference_depressed(result)
 depressed_male_data = depressed_gender_data[2]
-pprint(depressed_male_data)
+depressed_female_data = depressed_gender_data[-1]
+#pprint(depressed_male_data)
+
+
+
+# explore depressed male data
+def depressed_male_data_values(depressed_male_data, depressed_female_data):
+
+    study_year_male = []
+    study_year_female = []
+
+    for participant in depressed_male_data:
+        year = participant.get("Your current year of Study", "").strip().title()
+        study_year_male.append(year)
+    for participant in depressed_female_data:
+        year = participant.get("Your current year of Study", "").strip().title()
+        study_year_female.append(year)
+
+    # Extrapolate how many are in each year
+    count_male_year = Counter(study_year_male)
+    count_female_year = Counter(study_year_female)
+
+
+    print(f"There are {len(study_year_male)} and they are in {count_male_year}")
+    print(f"There are {len(study_year_female)} and they are in {count_female_year}")
+
+
+
+    return [study_year_male, study_year_female]
+
+
+[male_year_data, female_year_data] = depressed_male_data_values(depressed_male_data, depressed_female_data)
+
+
 
 
